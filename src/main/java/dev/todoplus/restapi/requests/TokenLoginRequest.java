@@ -1,0 +1,22 @@
+package dev.todoplus.restapi.requests;
+
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Project: todoplus-restapi
+ *
+ * @author miroslavsafar
+ * All rights reserved.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TokenLoginRequest {
+    @NotNull
+    String username;
+    @NotNull
+    String userToken;
+}
