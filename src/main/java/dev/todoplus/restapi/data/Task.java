@@ -70,6 +70,11 @@ public class Task {
 
     @Getter
     @Setter
+    @NotNull
+    private boolean myDay;
+
+    @Getter
+    @Setter
     @OneToMany(mappedBy = "task")
     private Set<SubTask> subTasks;
 }
