@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Project: exitgame
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.

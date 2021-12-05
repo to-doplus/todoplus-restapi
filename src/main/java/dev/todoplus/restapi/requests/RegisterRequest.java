@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 
 /**
- * Project: mminer
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.

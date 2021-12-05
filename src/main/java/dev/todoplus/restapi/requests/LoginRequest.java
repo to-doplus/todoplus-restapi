@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Project: mminer
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.

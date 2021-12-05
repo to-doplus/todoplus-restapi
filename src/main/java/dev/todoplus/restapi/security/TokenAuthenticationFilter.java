@@ -18,6 +18,13 @@ import static java.util.Optional.ofNullable;
 import static lombok.AccessLevel.PUBLIC;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 
+/**
+ * Project: todoplus-restapi
+ *
+ * @author miroslavsafar
+ * All rights reserved.
+ */
+
 @FieldDefaults(level = PUBLIC, makeFinal = true)
 public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final String BEARER = "Bearer";

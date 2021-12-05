@@ -13,7 +13,7 @@ import java.security.SecureRandom;
 import static io.jsonwebtoken.io.Encoders.BASE64;
 
 /**
- * Project: exitgame
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.
@@ -41,6 +41,11 @@ public class UserTokenService {
         return BASE64.encode(randomBytes);
     }
 
+    /**
+     * Issue a new user token
+     * @param user User
+     * @return User Token
+     */
     public String issueNewToken(User user) {
         val token = generateNewToken();
         val userToken = new UserToken(user, encoder.encode(token));

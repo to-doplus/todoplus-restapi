@@ -11,6 +11,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Project: todoplus-restapi
+ *
+ * @author miroslavsafar
+ * All rights reserved.
+ */
+
 @Component
 @FieldDefaults(makeFinal = true)
 public class TokenAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {

@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Project: mminer
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.

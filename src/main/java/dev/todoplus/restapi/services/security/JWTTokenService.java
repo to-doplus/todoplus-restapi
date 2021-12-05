@@ -17,6 +17,13 @@ import static io.jsonwebtoken.io.Encoders.BASE64;
 import static java.util.Objects.requireNonNull;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * Project: todoplus-restapi
+ *
+ * @author miroslavsafar
+ * All rights reserved.
+ */
+
 @Service
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 final class JWTTokenService implements Clock {

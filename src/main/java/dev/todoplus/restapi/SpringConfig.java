@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Project: mminer
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.

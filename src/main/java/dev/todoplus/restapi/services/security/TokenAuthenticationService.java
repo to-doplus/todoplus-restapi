@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Project: todoplus-restapi
+ *
+ * @author miroslavsafar
+ * All rights reserved.
+ */
+
 @Service
 final class TokenAuthenticationService implements UserAuthenticationService {
 

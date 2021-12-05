@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 /**
- * Project: mminer
+ * Project: todoplus-restapi
  *
  * @author miroslavsafar
  * All rights reserved.
