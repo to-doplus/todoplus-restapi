@@ -1,19 +1,18 @@
 package dev.todoplus.restapi.controllers;
 
-import dev.todoplus.restapi.data.Task;
 import dev.todoplus.restapi.data.TaskList;
-import dev.todoplus.restapi.exceptions.NoPermissionsException;
-import dev.todoplus.restapi.exceptions.TaskDoesNotExistException;
-import dev.todoplus.restapi.exceptions.TaskListDoesNotExistException;
-import dev.todoplus.restapi.exceptions.UserDoesNotExistException;
+import dev.todoplus.restapi.data.users.User;
+import dev.todoplus.restapi.exceptions.*;
 import dev.todoplus.restapi.requests.create.CreateSubTaskRequest;
 import dev.todoplus.restapi.requests.create.CreateTaskListRequest;
 import dev.todoplus.restapi.requests.create.CreateTaskRequest;
 import dev.todoplus.restapi.requests.update.UpdateSubTaskRequest;
 import dev.todoplus.restapi.requests.update.UpdateTaskListRequest;
 import dev.todoplus.restapi.requests.update.UpdateTaskRequest;
+import dev.todoplus.restapi.responses.dto.TaskDTO;
 import dev.todoplus.restapi.services.TaskService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
  * All rights reserved.
  */
 @RestController
-@RequestMapping("public/tasklists")
+@RequestMapping("tasklists")
 public class TaskListController {
 
     private final TaskService taskService;
@@ -34,15 +33,15 @@ public class TaskListController {
     }
 
     @GetMapping
-    public TaskList[] getAllTaskLists() {
-        return taskService.getAllTaskLists("safarmirek").toArray(new TaskList[0]);
+    public TaskList[] getAllTaskLists(@AuthenticationPrincipal User user) {
+        return taskService.getAllTaskLists(user.getUsername()).toArray(new TaskList[0]);
     }
 
     @PostMapping
-    public TaskList createNewTaskList(@RequestBody CreateTaskListRequest request) {
+    public TaskList createNewTaskList(@AuthenticationPrincipal User user, @RequestBody CreateTaskListRequest request) {
         TaskList taskList;
         try {
-            taskList = taskService.createNewTaskList("safarmirek", request.getDisplayName());
+            taskList = taskService.createNewTaskList(user.getUsername(), request.getDisplayName());
         } catch (UserDoesNotExistException taskListDoesNotExistException) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task list was not found.");
         }
@@ -59,14 +58,19 @@ public class TaskListController {
         }
     }
 
+    @DeleteMapping("/{taskListId}")
+    public void deleteTask(@PathVariable int taskListId) {
+        taskService.deleteTaskList(taskListId);
+    }
+
     @GetMapping("/{taskListId}/tasks")
-    public Task[] getTasks(@PathVariable int taskListId) {
-        return taskService.getAllTasks(taskListId).toArray(new Task[0]);
+    public TaskDTO[] getTasks(@PathVariable int taskListId) {
+        return taskService.getAllTasks(taskListId).toArray(new TaskDTO[0]);
     }
 
     @PostMapping("/{taskListId}/tasks")
-    public Task createNewTask(@PathVariable int taskListId, @RequestBody CreateTaskRequest request) {
-        Task task;
+    public TaskDTO createNewTask(@PathVariable int taskListId, @RequestBody CreateTaskRequest request) {
+        TaskDTO task;
         try {
             task = taskService.createNewTask(taskListId, request.getTitle());
         } catch (TaskListDoesNotExistException taskListDoesNotExistException) {
@@ -77,11 +81,11 @@ public class TaskListController {
     }
 
     @PutMapping("/{taskListId}/tasks/{taskId}")
-    public Task updateTask(@PathVariable int taskListId, @PathVariable int taskId, @RequestBody UpdateTaskRequest request) {
-        Task task;
+    public TaskDTO updateTask(@PathVariable int taskListId, @PathVariable int taskId, @RequestBody UpdateTaskRequest request) {
+        TaskDTO task;
         try {
             task = taskService.updateTask(taskListId, taskId, request);
-        } catch (Exception e) {
+        } catch (TaskDoesNotExistException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task was not found.");
         }
 
@@ -89,8 +93,8 @@ public class TaskListController {
     }
 
     @PutMapping("/{taskListId}/tasks/{taskId}/close")
-    public Task closeTask(@PathVariable int taskListId, @PathVariable int taskId) {
-        Task task;
+    public TaskDTO closeTask(@PathVariable int taskListId, @PathVariable int taskId) {
+        TaskDTO task;
         try {
             task = taskService.closeTask(taskListId, taskId);
         } catch (Exception e) {
@@ -99,9 +103,38 @@ public class TaskListController {
         return task;
     }
 
+    @PutMapping("/{taskListId}/tasks/{taskId}/reopen")
+    public TaskDTO reopenTask(@PathVariable int taskListId, @PathVariable int taskId) {
+        TaskDTO task;
+        try {
+            task = taskService.reopenTask(taskListId, taskId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task was not found.");
+        }
+        return task;
+    }
+
+    @DeleteMapping("/{taskListId}/tasks/{taskId}")
+    public void deleteTask(@PathVariable int taskListId, @PathVariable int taskId) {
+        try {
+            taskService.deleteTask(taskListId, taskId);
+        } catch (TaskDoesNotExistException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task was not found");
+        }
+    }
+
+    @DeleteMapping("/{taskListId}/tasks/{taskId}/duedate")
+    public TaskDTO deleteTaskDueDate(@PathVariable int taskListId, @PathVariable int taskId) {
+        try {
+            return taskService.removeDueDate(taskListId, taskId);
+        } catch (TaskDoesNotExistException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task was not found");
+        }
+    }
+
     @PostMapping("/{taskListId}/tasks/{taskId}/subtasks")
-    public Task createNewSubTask(@PathVariable int taskListId, @PathVariable int taskId, @RequestBody CreateSubTaskRequest request) {
-        Task task;
+    public TaskDTO createNewSubTask(@PathVariable int taskListId, @PathVariable int taskId, @RequestBody CreateSubTaskRequest request) {
+        TaskDTO task;
         try {
             task = taskService.createNewSubTask(taskListId, taskId, request.getTitle());
         } catch (TaskListDoesNotExistException taskListDoesNotExistException) {
@@ -112,8 +145,8 @@ public class TaskListController {
     }
 
     @PutMapping("/{taskListId}/tasks/{taskId}/subtasks/{subTaskId}")
-    public Task updateSubTask(@PathVariable int taskListId, @PathVariable int taskId, @PathVariable int subTaskId, @RequestBody UpdateSubTaskRequest request) {
-        Task task;
+    public TaskDTO updateSubTask(@PathVariable int taskListId, @PathVariable int taskId, @PathVariable int subTaskId, @RequestBody UpdateSubTaskRequest request) {
+        TaskDTO task;
         try {
             task = taskService.updateSubTask(taskListId, taskId, subTaskId, request);
         } catch (Exception e) {
@@ -124,8 +157,8 @@ public class TaskListController {
     }
 
     @PutMapping("/{taskListId}/tasks/{taskId}/subtasks/{subTaskId}/close")
-    public Task closeSubTask(@PathVariable int taskListId, @PathVariable int taskId, @PathVariable int subTaskId) {
-        Task task;
+    public TaskDTO closeSubTask(@PathVariable int taskListId, @PathVariable int taskId, @PathVariable int subTaskId) {
+        TaskDTO task;
         try {
             task = taskService.closeSubTask(taskListId, taskId, subTaskId);
         } catch (Exception e) {
@@ -135,26 +168,47 @@ public class TaskListController {
         return task;
     }
 
+    @PutMapping("/{taskListId}/tasks/{taskId}/subtasks/{subTaskId}/reopen")
+    public TaskDTO reopenSubTask(@PathVariable int taskListId, @PathVariable int taskId, @PathVariable int subTaskId) {
+        TaskDTO task;
+        try {
+            task = taskService.reopenSubTask(taskListId, taskId, subTaskId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subtask was not found.");
+        }
+
+        return task;
+    }
+
+    @DeleteMapping("/{taskListId}/tasks/{taskId}/subtasks/{subTaskId}")
+    public TaskDTO deleteSubTask(@PathVariable int taskListId, @PathVariable int taskId, @PathVariable int subTaskId) {
+        try {
+            return taskService.deleteSubTaskAndGet(taskListId, taskId, subTaskId);
+        } catch (SubTaskDoesNotExistException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subtask was not found");
+        }
+    }
+
     // ---- My Day Endpoints ----
 
     @GetMapping("/c/myday/tasks")
-    public Task[] getMyDayTasks() {
-        return taskService.getMyDayTasks("safarmirek").toArray(new Task[0]);
+    public TaskDTO[] getMyDayTasks(@AuthenticationPrincipal User user) {
+        return taskService.getMyDayTasks(user.getUsername()).toArray(new TaskDTO[0]);
     }
 
     @PutMapping("/c/myday/tasks/add/{taskId}")
-    public Task addToMyDay(@PathVariable int taskId) {
+    public TaskDTO addToMyDay(@AuthenticationPrincipal User user, @PathVariable int taskId) {
         try {
-            return taskService.addToMyDayList("safarmirek", taskId);
+            return taskService.addToMyDayList(user.getUsername(), taskId);
         } catch (TaskDoesNotExistException | NoPermissionsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You do not have permissions to do that.");
         }
     }
 
     @PutMapping("/c/myday/tasks/remove/{taskId}")
-    public Task removeFromMyDay(@PathVariable int taskId) {
+    public TaskDTO removeFromMyDay(@AuthenticationPrincipal User user, @PathVariable int taskId) {
         try {
-            return taskService.removeFromMyDayList("safarmirek", taskId);
+            return taskService.removeFromMyDayList(user.getUsername(), taskId);
         } catch (TaskDoesNotExistException | NoPermissionsException e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You do not have permissions to do that.");
         }
@@ -162,8 +216,8 @@ public class TaskListController {
 
     // ---- Important Tasks Endpoints ----
     @GetMapping("/c/important/tasks")
-    public Task[] getImportantTasks() {
-        return taskService.getImportantTasks("safarmirek").toArray(new Task[0]);
+    public TaskDTO[] getImportantTasks(@AuthenticationPrincipal User user) {
+        return taskService.getImportantTasks(user.getUsername()).toArray(new TaskDTO[0]);
     }
 
 

@@ -1,7 +1,10 @@
-package dev.todoplus.restapi.exceptions;/**
+package dev.todoplus.restapi.exceptions;
+
+/**
  * Project: todoplus-restapi
- * @author  miroslavsafar
+ *
+ * @author miroslavsafar
  * All rights reserved.
  */
-public class InvalidNameException {
+public class InvalidNameException extends RuntimeException{
 }

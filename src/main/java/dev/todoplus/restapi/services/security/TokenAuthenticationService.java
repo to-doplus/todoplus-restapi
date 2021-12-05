@@ -34,7 +34,7 @@ final class TokenAuthenticationService implements UserAuthenticationService {
         if (!user.isPresent()) {
             return Optional.empty();
         }
-        String token = tokens.expiring(ImmutableMap.of("username", username));
+        String token = tokens.permanent(ImmutableMap.of("username", username));
         String userToken = userTokenService.issueNewToken(user.get());
         return Optional.of(new LoginResponse(token, userToken, user.get().getId()));
     }
@@ -49,7 +49,7 @@ final class TokenAuthenticationService implements UserAuthenticationService {
         if (!token.isPresent()) {
             return Optional.empty();
         }
-        return Optional.of(new LoginResponse(tokens.expiring(ImmutableMap.of("username", user.get().getUsername())), userToken, user.get().getId()));
+        return Optional.of(new LoginResponse(tokens.permanent(ImmutableMap.of("username", user.get().getUsername())), userToken, user.get().getId()));
     }
 
     @Override

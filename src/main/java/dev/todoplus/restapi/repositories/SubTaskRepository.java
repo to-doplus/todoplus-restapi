@@ -18,4 +18,6 @@ public interface SubTaskRepository extends JpaRepository<SubTask, Integer> {
 
     Set<SubTask> findAllByTask(Task task);
 
+    void deleteSubTaskByIdAndTask(int subTaskId, Task task);
+
 }
